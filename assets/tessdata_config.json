@@ -1,0 +1,8 @@
+{
+          "tessdata_manager_config": {
+            "tessdata_path": "assets/tessdata/",
+            "user_words_suffix": "user-words",
+            "user_patterns_suffix": "user-patterns"
+          }
+        }
+        
