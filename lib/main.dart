@@ -2,14 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'screens/main_screen.dart';
+import 'screens/main_screen_with_voice.dart';
 import 'screens/auth_screen.dart';
 import 'services/tts_service.dart';
+import 'services/voice_assistant_manager.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   // Initialize TTS Service
   await TTSService.initialize();
@@ -17,8 +22,28 @@ void main() async {
   runApp(const InvenTreeApp());
 }
 
-class InvenTreeApp extends StatelessWidget {
+class InvenTreeApp extends StatefulWidget {
   const InvenTreeApp({super.key});
+
+  @override
+  State<InvenTreeApp> createState() => _InvenTreeAppState();
+}
+
+class _InvenTreeAppState extends State<InvenTreeApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Initialize voice assistant after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      VoiceAssistantManager.instance.initialize(context);
+    });
+  }
+
+  @override
+  void dispose() {
+    VoiceAssistantManager.instance.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +87,7 @@ class InvenTreeApp extends StatelessWidget {
           }
 
           if (snapshot.hasData) {
-            return const MainScreen();
+            return const MainScreenWithVoiceAssistant();
           } else {
             return const AuthScreen();
           }
