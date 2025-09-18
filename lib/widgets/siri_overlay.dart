@@ -91,10 +91,10 @@ class _SiriOverlayState extends State<SiriOverlay>
           decoration: BoxDecoration(
             gradient: RadialGradient(
               center: Alignment.center,
-              radius: 1.0,
+              radius: 1.2,
               colors: [
-                Colors.black.withOpacity(0.3),
-                Colors.black.withOpacity(0.8),
+                Colors.black.withOpacity(0.4),
+                Colors.black.withOpacity(0.9),
               ],
             ),
           ),
@@ -109,33 +109,33 @@ class _SiriOverlayState extends State<SiriOverlay>
                     animation: _pulseAnimation,
                     builder: (context, child) {
                       return Container(
-                        width: 250 * _pulseAnimation.value,
-                        height: 250 * _pulseAnimation.value,
+                        width: 200 * _pulseAnimation.value,
+                        height: 200 * _pulseAnimation.value,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: RadialGradient(
                             colors: _getGradientColors(),
-                            stops: [0.0, 0.6, 1.0],
+                            stops: [0.0, 0.7, 1.0],
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: _getGlowColor().withOpacity(0.6),
-                              blurRadius: 40,
-                              spreadRadius: 20,
+                              color: _getGlowColor().withOpacity(0.8),
+                              blurRadius: 50,
+                              spreadRadius: 15,
                             ),
                           ],
                         ),
                         child: Center(
                           child: Container(
-                            width: 80,
-                            height: 80,
+                            width: 60,
+                            height: 60,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withOpacity(0.95),
                             ),
                             child: Icon(
                               _getStatusIcon(),
-                              size: 40,
+                              size: 30,
                               color: _getGlowColor(),
                             ),
                           ),
@@ -144,16 +144,16 @@ class _SiriOverlayState extends State<SiriOverlay>
                     },
                   ),
                   
-                  SizedBox(height: 60),
+                  SizedBox(height: 50),
                   
                   // Status text
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(25),
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withOpacity(0.4),
                         width: 1,
                       ),
                     ),
@@ -161,32 +161,12 @@ class _SiriOverlayState extends State<SiriOverlay>
                       _getStatusMessage(),
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  
-                  SizedBox(height: 30),
-                  
-                  // Language indicator
-                  if (_currentState?.detectedLanguage != null)
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        _getLanguageDisplayName(_currentState!.detectedLanguage),
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
                 ],
               ),
             ),
@@ -280,22 +260,25 @@ class _SiriOverlayState extends State<SiriOverlay>
   }
 
   String _getStatusMessage() {
-    if (_currentState == null) return 'Voice Assistant';
+    if (_currentState == null) return 'Nova';
     
     switch (_currentState!.status) {
       case 'WakeWordDetected':
-        return 'Listening...';
+        return 'Yes?';
       case 'ListeningForCommand':
         return 'What can I help you with?';
+      case 'CommandReceived':
+        return 'Got it!';
       case 'ProcessingCommand':
         return 'Processing...';
       case 'CommandSuccess':
         return 'Done!';
       case 'CommandFailed':
-      case 'Error':
         return 'Try again';
+      case 'Error':
+        return 'Sorry, try again';
       default:
-        return _currentState!.message;
+        return _currentState!.message.isNotEmpty ? _currentState!.message : 'Nova';
     }
   }
 

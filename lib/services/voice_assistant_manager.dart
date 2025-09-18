@@ -48,9 +48,9 @@ class VoiceAssistantManager {
           _showSiriPopup();
         } else if (state.status == 'ListeningForCommand' && _overlayEntry == null) {
           _showSiriPopup();
-        } else if (state.status == 'CommandSuccess' || state.status == 'CommandFailed') {
+        } else if (state.status == 'CommandSuccess' || state.status == 'CommandFailed' || state.status == 'Error') {
           // Auto-hide popup after command completion
-          Future.delayed(Duration(seconds: 1), () {
+          Future.delayed(Duration(seconds: 2), () {
             _hideSiriPopup();
           });
         }
@@ -91,6 +91,16 @@ class VoiceAssistantManager {
     
     _showSiriPopup();
     await EnhancedVoiceAssistant.instance.manualTrigger();
+  }
+  
+  // Force show popup (for debugging)
+  void showPopup() {
+    _showSiriPopup();
+  }
+  
+  // Force hide popup
+  void hidePopup() {
+    _hideSiriPopup();
   }
   
   // Check if user is logged in and assistant is active

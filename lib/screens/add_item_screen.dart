@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../models/grocery_item.dart';
 import '../providers/inventory_provider.dart';
+
 import '../services/ocr_service.dart';
 import '../services/voice_assistant_manager.dart';
 
@@ -18,6 +19,7 @@ class AddItemScreen extends StatefulWidget {
 
 class _AddItemScreenState extends State<AddItemScreen> {
   final OCRService _ocrService = OCRService();
+
   final ImagePicker _picker = ImagePicker();
   bool _isProcessing = false;
   String? _lastOcrText;
@@ -81,9 +83,9 @@ class _AddItemScreenState extends State<AddItemScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            items.isEmpty
+items.isEmpty
                 ? 'No items found in receipt'
-                : 'Added ${items.length} items from receipt',
+                : 'Added ${items.length} items from receipt'
           ),
         ),
       );

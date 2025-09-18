@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:vibration/vibration.dart';
 import 'package:translator/translator.dart';
 import 'voice_service.dart';
 import 'tts_service.dart';
@@ -31,30 +30,20 @@ class EnhancedVoiceAssistant {
   StreamController<AssistantState> _stateController = StreamController<AssistantState>.broadcast();
   Stream<AssistantState> get stateStream => _stateController.stream;
   
-  // Wake words in multiple languages
+  // Wake words in multiple languages (Siri-like)
   final Map<String, List<String>> _wakeWords = {
-    'en': ['hey nova', 'ok nova', 'nova', 'hey assistant', 'assistant'],
-    'hi': ['हे नोवा', 'ओके नोवा', 'नोवा', 'असिस्टेंट', 'सहायक', 'hey nova', 'ok nova'],
-    'mr': ['हे नोवा', 'ओके नोवा', 'नोवा', 'सहाय्यक', 'असिस्टंट', 'hey nova'],
-    'kn': ['ಹೇ ನೋವಾ', 'ಓಕೆ ನೋವಾ', 'ನೋವಾ', 'ಸಹಾಯಕ', 'hey nova'],
-    'ta': ['ஹே நோவா', 'ஓகே நோவா', 'நோவா', 'உதவியாளர்', 'hey nova'],
-    'te': ['హే నోవా', 'ఓకే నోవా', 'నోవా', 'సహాయకుడు', 'hey nova'],
-    'bn': ['হে নোভা', 'ওকে নোভা', 'নোভা', 'সহায়ক', 'hey nova'],
-    'gu': ['હે નોવા', 'ઓકે નોવા', 'નોવા', 'સહાયક', 'hey nova'],
-    'pa': ['ਹੇ ਨੋਵਾ', 'ਓਕੇ ਨੋਵਾ', 'ਨੋਵਾ', 'ਸਹਾਇਕ', 'hey nova'],
-    'ml': ['ഹേ നോവ', 'ഓകെ നോവ', 'നോവ', 'സഹായി', 'hey nova'],
-    'or': ['ହେ ନୋଭା', 'ଓକେ ନୋଭା', 'ନୋଭା', 'ସହାୟକ', 'hey nova'],
-    'as': ['হে নোভা', 'অকে নোভা', 'নোভা', 'সহায়ক', 'hey nova'],
-    'es': ['hola nova', 'ok nova', 'nova', 'asistente'],
-    'fr': ['salut nova', 'ok nova', 'nova', 'assistant'],
-    'de': ['hallo nova', 'ok nova', 'nova', 'assistent'],
-    'it': ['ciao nova', 'ok nova', 'nova', 'assistente'],
-    'pt': ['oi nova', 'ok nova', 'nova', 'assistente'],
-    'ru': ['привет нова', 'ок нова', 'нова', 'ассистент'],
-    'ja': ['ヘイノヴァ', 'オーケーノヴァ', 'ノヴァ', 'アシスタント'],
-    'ko': ['헤이 노바', '오케이 노바', '노바', '어시스턴트'],
-    'zh': ['嘿诺瓦', '好的诺瓦', '诺瓦', '助手'],
-    'ar': ['مرحبا نوفا', 'حسنا نوفا', 'نوفا', 'مساعد'],
+    'en': ['hey siri', 'ok siri', 'siri', 'hey nova', 'ok nova', 'nova'],
+    'hi': ['हे सिरी', 'ओके सिरी', 'सिरी', 'हे नोवा', 'ओके नोवा', 'नोवा', 'hey siri', 'ok siri'],
+    'mr': ['हे सिरी', 'ओके सिरी', 'सिरी', 'हे नोवा', 'ओके नोवा', 'नोवा', 'hey siri'],
+    'kn': ['ಹೇ ಸಿರಿ', 'ಓಕೆ ಸಿರಿ', 'ಸಿರಿ', 'ಹೇ ನೋವಾ', 'ಓಕೆ ನೋವಾ', 'ನೋವಾ', 'hey siri'],
+    'ta': ['ஹே சிரி', 'ஓகே சிரி', 'சிரி', 'ஹே நோவா', 'ஓகே நோவா', 'நோவா', 'hey siri'],
+    'te': ['హే సిరి', 'ఓకే సిరి', 'సిరి', 'హే నోవా', 'ఓకే నోవా', 'నోవా', 'hey siri'],
+    'bn': ['হে সিরি', 'ওকে সিরি', 'সিরি', 'হে নোভা', 'ওকে নোভা', 'নোভা', 'hey siri'],
+    'gu': ['હે સિરી', 'ઓકે સિરી', 'સિરી', 'હે નોવા', 'ઓકે નોવા', 'નોવા', 'hey siri'],
+    'pa': ['ਹੇ ਸਿਰੀ', 'ਓਕੇ ਸਿਰੀ', 'ਸਿਰੀ', 'ਹੇ ਨੋਵਾ', 'ਓਕੇ ਨੋਵਾ', 'ਨੋਵਆ', 'hey siri'],
+    'ml': ['ഹേ സിരി', 'ഓകെ സിരി', 'സിരി', 'ഹേ നോവ', 'ഓകെ നോവ', 'നോവ', 'hey siri'],
+    'or': ['ହେ ସିରି', 'ଓକେ ସିରି', 'ସିରି', 'ହେ ନୋଭା', 'ଓକେ ନୋଭା', 'ନୋଭା', 'hey siri'],
+    'as': ['হে সিরি', 'অকে সিরি', 'সিরি', 'হে নোভা', 'অকে নোভা', 'নোভা', 'hey siri'],
   };
 
   bool get isListening => _isListening;
@@ -98,7 +87,7 @@ class EnhancedVoiceAssistant {
   }
 
   void _startContinuousListening() {
-    _listeningTimer = Timer.periodic(Duration(seconds: 1), (timer) async {
+    _listeningTimer = Timer.periodic(Duration(milliseconds: 500), (timer) async {
       if (!_isListening || _isProcessingCommand || _isAssistantActive) return;
       
       try {
@@ -111,13 +100,13 @@ class EnhancedVoiceAssistant {
             onListeningComplete: () {
               debugPrint('👂 Listening cycle complete');
             },
-            timeout: Duration(seconds: 3),
+            timeout: Duration(seconds: 2),
             language: 'en_US',
           );
         }
       } catch (e) {
         debugPrint('❌ Listening error: $e');
-        await Future.delayed(Duration(milliseconds: 500));
+        await Future.delayed(Duration(milliseconds: 200));
       }
     });
   }
@@ -151,16 +140,17 @@ class EnhancedVoiceAssistant {
     await _voiceService.stopListening();
     _listeningTimer?.cancel();
     
-    // Haptic feedback
-    HapticFeedback.mediumImpact();
-    if (await Vibration.hasVibrator() ?? false) {
-      Vibration.vibrate(duration: 150);
+    // Simple haptic feedback
+    try {
+      HapticFeedback.lightImpact();
+    } catch (e) {
+      debugPrint('Haptic feedback not available: $e');
     }
     
     _updateState('WakeWordDetected', 'Wake word detected!');
     
     // Brief pause then start listening for command
-    await Future.delayed(Duration(milliseconds: 300));
+    await Future.delayed(Duration(milliseconds: 500));
     
     // Listen for command immediately
     await _listenForCommand();
@@ -168,7 +158,7 @@ class EnhancedVoiceAssistant {
 
   Future<void> _listenForCommand() async {
     try {
-      _updateState('ListeningForCommand', 'Listening for your command...');
+      _updateState('ListeningForCommand', 'What can I help you with?');
       
       String command = '';
       bool commandReceived = false;
@@ -177,30 +167,34 @@ class EnhancedVoiceAssistant {
         onResult: (text) {
           command = text;
           if (text.isNotEmpty) {
+            debugPrint('🎯 Command received: $text');
             _updateState('CommandReceived', 'Processing: "$text"');
           }
         },
         onListeningComplete: () {
           commandReceived = true;
         },
-        timeout: Duration(seconds: 8),
+        timeout: Duration(seconds: 6),
         language: _getLanguageCode(_detectedLanguage),
       );
       
       // Wait for command completion
       int attempts = 0;
-      while (!commandReceived && attempts < 80) {
+      while (!commandReceived && attempts < 60) {
         await Future.delayed(Duration(milliseconds: 100));
         attempts++;
       }
       
-      if (command.isNotEmpty) {
+      if (command.isNotEmpty && command.trim().length > 1) {
         await _processCommand(command);
       } else {
-        await _speakInDetectedLanguage("I didn't hear anything");
+        _updateState('CommandFailed', "I didn't hear anything");
+        await _speakInDetectedLanguage("I didn't hear anything. Try saying 'Hey Nova' again.");
       }
       
     } catch (e) {
+      debugPrint('❌ Command listening error: $e');
+      _updateState('Error', 'Sorry, there was an error');
       await _speakInDetectedLanguage('Sorry, there was an error');
     } finally {
       _resumeBackgroundListening();
@@ -241,7 +235,11 @@ class EnhancedVoiceAssistant {
       
       if (result.success) {
         _updateState('CommandSuccess', responseMessage);
-        HapticFeedback.lightImpact();
+        try {
+          HapticFeedback.selectionClick();
+        } catch (e) {
+          // Ignore haptic errors
+        }
       } else {
         _updateState('CommandFailed', responseMessage);
       }
@@ -314,12 +312,12 @@ class EnhancedVoiceAssistant {
   }
 
   void _resumeBackgroundListening() async {
-    await Future.delayed(Duration(milliseconds: 1000));
+    await Future.delayed(Duration(milliseconds: 1500));
     _isProcessingCommand = false;
     _isAssistantActive = false;
     
     if (_isListening) {
-      _updateState('Listening', 'Listening for wake word...');
+      _updateState('Listening', 'Listening for "Hey Nova"...');
       _startContinuousListening();
     }
   }
